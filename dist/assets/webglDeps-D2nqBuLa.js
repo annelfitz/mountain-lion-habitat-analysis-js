@@ -1,0 +1,7 @@
+import{o as h}from"./BufferObject-DndW88Ya.js";import{s as c}from"./Program-BYyhhmB_.js";import{m as y,a as _}from"./Program-BYyhhmB_.js";import{aD as j}from"./index-D5tTa6H3.js";import{e as O}from"./ShaderCompiler-G2XYGDs6.js";import{h as P}from"./VertexArrayObject-Jouvwi2B.js";import{e as A}from"./ProgramTemplate-D6TnT3ZW.js";import"./VertexAttributeLocations-0Y3DVxfo.js";class l{constructor(e){this._rctx=e,this._store=new Map}dispose(){this._store.forEach(e=>e.dispose()),this._store.clear()}acquire(e,r,t,n){const s=e+r+JSON.stringify(Array.from(t.entries())),o=this._store.get(s);if(o!=null)return o.ref(),o;const i=new c(this._rctx,e,r,t,n);return i.ref(),this._store.set(s,i),i}get test(){}}function p(f){const{options:e,value:r}=f;return typeof e[r]=="number"}function x(f){let e="";for(const r in f){const t=f[r];if(typeof t=="boolean")t&&(e+=`#define ${r}
+`);else if(typeof t=="number")e+=`#define ${r} ${t.toFixed()}
+`;else if(typeof t=="object")if(p(t)){const{value:n,options:s,namespace:o}=t,i=o?`${o}_`:"";for(const a in s)e+=`#define ${i}${a} ${s[a].toFixed()}
+`;e+=`#define ${r} ${i}${n}
+`}else{const n=t.options;let s=0;for(const o in n)e+=`#define ${n[o]} ${(s++).toFixed()}
+`;e+=`#define ${r} ${n[t.value]}
+`}}return e}export{h as BufferObject,y as FramebufferObject,c as Program,l as ProgramCache,_ as Renderbuffer,O as ShaderCompiler,j as Texture,P as VertexArrayObject,A as createProgram,x as glslifyDefineMap};

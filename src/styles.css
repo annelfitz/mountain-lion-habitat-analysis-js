@@ -102,6 +102,7 @@ body {
    Maps
    ----------------------------- */
 .app-map {
+  display: block;
   opacity: 0;
   visibility: hidden;
   z-index: 2;
@@ -114,6 +115,8 @@ body {
 }
 
 #mapElement {
+  flex: 1 1 auto;
+  min-block-size: 22rem;
   box-shadow: var(--calcite-shadow-md);
   overflow: visible;
 }

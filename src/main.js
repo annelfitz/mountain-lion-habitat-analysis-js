@@ -52,12 +52,13 @@ const terrainRuggednessMaxStat = document.getElementById(
   "terrainRuggednessMaxStat",
 );
 
-const filterItems = Array.from(filterList.querySelectorAll("calcite-list-item"));
+const filterItems = Array.from(
+  filterList.querySelectorAll("calcite-list-item"),
+);
 
 const wholeNumberFormatter = new Intl.NumberFormat("en-US");
 
 mapElement.dataset.loaded = "false";
-
 function syncRangeStats(slider, minElement, maxElement, unit) {
   minElement.textContent = `${wholeNumberFormatter.format(Math.round(slider.minValue))} ${unit}`;
   maxElement.textContent = `${wholeNumberFormatter.format(Math.round(slider.maxValue))} ${unit}`;
@@ -231,73 +232,81 @@ async function setupInsetMap() {
     basemap: "topo-vector",
     layers: [insetPortalLayer, insetExtentLayer],
   });
-
-  await insetMapElement.viewOnReady();
-  const mainView = mapElement.view;
-  const insetView = insetMapElement.view;
-
-  insetView.navigation.mouseWheelZoomEnabled = false;
-  insetView.navigation.browserTouchPanEnabled = false;
-  insetView.navigation.momentumEnabled = false;
-  insetView.popupEnabled = false;
-  insetView.highlightOptions = null;
-  insetView.ui.components = [];
-  let insetZoom = getInsetZoom(mainView.zoom ?? 0);
-
-  const syncInsetZoom = async () => {
-    const nextInsetZoom = getInsetZoom(mainView.zoom ?? 0);
-
-    if (nextInsetZoom === insetZoom) {
-      return;
-    }
-
-    insetZoom = nextInsetZoom;
-    await insetView.goTo({ zoom: nextInsetZoom }, { animate: true });
-  };
-
-  const syncInsetExtent = (extent = mainView?.extent) => {
-    if (!extent) {
-      return;
-    }
-
-    updateOverlayGraphics({
-      extent,
-      maskGraphic: insetExtentGraphic,
-      outlineGraphic: insetExtentOutlineGraphic,
-    });
-  };
-
-  const initialExtent = mainView.extent?.clone();
-
-  if (!initialExtent) {
-    return;
+  if (!insetMapElement.ready) {
+    insetMapElement.addEventListener(
+      "arcgisViewReadyChange",
+      handleInsetMapReady,
+      {
+        once: true,
+      },
+    );
+  } else {
+    handleInsetMapReady();
   }
 
-  await insetView.goTo(
-    {
-      center: initialExtent.center,
-      zoom: insetZoom,
-    },
-    { animate: false },
-  );
+  async function handleInsetMapReady() {
+    insetMapElement.navigation.mouseWheelZoomEnabled = false;
+    insetMapElement.navigation.browserTouchPanEnabled = false;
+    insetMapElement.navigation.momentumEnabled = false;
+    insetMapElement.popupEnabled = false;
+    insetMapElement.highlightOptions = null;
+    let insetZoom = getInsetZoom(mapElement.zoom ?? 0);
 
-  const insetPanBounds = insetView.extent?.clone();
-  if (insetPanBounds) {
-    insetView.constraints = {
-      ...insetView.constraints,
-      geometry: insetPanBounds,
+    const syncInsetZoom = async () => {
+      const nextInsetZoom = getInsetZoom(mapElement.zoom ?? 0);
+
+      if (nextInsetZoom === insetZoom) {
+        return;
+      }
+
+      insetZoom = nextInsetZoom;
+      await insetMapElement.goTo({ zoom: nextInsetZoom }, { animate: true });
     };
-  }
 
-  syncInsetExtent(initialExtent);
-  insetMapElement.dataset.loaded = "true";
-  reactiveUtils.watch(() => mainView.extent, syncInsetExtent);
-  reactiveUtils.watch(
-    () => mainView.zoom,
-    () => {
-      void syncInsetZoom();
-    },
-  );
+    const syncInsetExtent = (extent = mapElement?.extent) => {
+      if (!extent) {
+        return;
+      }
+
+      updateOverlayGraphics({
+        extent,
+        maskGraphic: insetExtentGraphic,
+        outlineGraphic: insetExtentOutlineGraphic,
+      });
+    };
+
+    const initialExtent = mapElement.extent?.clone();
+
+    if (!initialExtent) {
+      return;
+    }
+
+    await insetMapElement.goTo(
+      {
+        center: initialExtent.center,
+        zoom: insetZoom,
+      },
+      { animate: false },
+    );
+
+    const insetPanBounds = insetMapElement.extent?.clone();
+    if (insetPanBounds) {
+      insetMapElement.constraints = {
+        ...insetMapElement.constraints,
+        geometry: insetPanBounds,
+      };
+    }
+
+    syncInsetExtent(initialExtent);
+    insetMapElement.dataset.loaded = "true";
+    reactiveUtils.watch(() => mapElement.extent, syncInsetExtent);
+    reactiveUtils.watch(
+      () => mapElement.zoom,
+      () => {
+        void syncInsetZoom();
+      },
+    );
+  }
 }
 
 const ROAD_BAND_ID = 0;
@@ -681,49 +690,55 @@ async function initializeApp() {
   });
 
   mapElement.map = map;
-  await mapElement.viewOnReady();
-
-  const mainView = mapElement.view;
-
-  await ensureInsetMapSetup();
-
-  const highlightedAreaExtent = await addExtentOverlay({
-    layers: operationalLayers,
-    map,
-  });
-
-  if (highlightedAreaExtent) {
-    await mainView.goTo(highlightedAreaExtent, { animate: false });
-
-    if ((mainView.zoom ?? 0) < MAIN_START_ZOOM) {
-      await mainView.goTo(
-        {
-          center: mainView.center,
-          zoom: MAIN_START_ZOOM,
-        },
-        { animate: false },
-      );
-    }
-
-    if (homeElement) {
-      homeElement.viewpoint = mainView.viewpoint.clone();
-    }
-
-    const mainPanBounds = highlightedAreaExtent.clone();
-    if (mainPanBounds) {
-      mainView.constraints = {
-        ...mainView.constraints,
-        geometry: mainPanBounds,
-        minZoom: MAIN_START_ZOOM,
-        maxZoom: MAIN_MAX_ZOOM,
-      };
-    }
+  if (!mapElement.ready) {
+    mapElement.addEventListener("arcgisViewReadyChange", handleMapReady, {
+      once: true,
+    });
+  } else {
+    handleMapReady();
   }
 
-  await map.basemap.loadAll();
-  map.basemap.baseLayers.forEach((layer) => {
-    layer.effect = "grayscale(1) opacity(0.5)";
-  });
+  async function handleMapReady() {
+    await ensureInsetMapSetup();
+
+    const highlightedAreaExtent = await addExtentOverlay({
+      layers: operationalLayers,
+      map,
+    });
+
+    if (highlightedAreaExtent) {
+      await mapElement.goTo(highlightedAreaExtent, { animate: false });
+
+      if ((mapElement.zoom ?? 0) < MAIN_START_ZOOM) {
+        await mapElement.goTo(
+          {
+            center: mapElement.center,
+            zoom: MAIN_START_ZOOM,
+          },
+          { animate: false },
+        );
+      }
+
+      if (homeElement) {
+        homeElement.viewpoint = mapElement.viewpoint.clone();
+      }
+
+      const mainPanBounds = highlightedAreaExtent.clone();
+      if (mainPanBounds) {
+        mapElement.constraints = {
+          ...mapElement.constraints,
+          geometry: mainPanBounds,
+          minZoom: MAIN_START_ZOOM,
+          maxZoom: MAIN_MAX_ZOOM,
+        };
+      }
+    }
+
+    await map.basemap.loadAll();
+    map.basemap.baseLayers.forEach((layer) => {
+      layer.effect = "grayscale(1) opacity(0.5)";
+    });
+  }
 
   function updateHabitatLayer() {
     const selectedLayerId = getSelectedLayerId();

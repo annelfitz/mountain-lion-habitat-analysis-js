@@ -1,7 +1,6 @@
 {
-  "name": "js-maps-sdk-vite-template",
-  "description": "ArcGIS Maps SDK for JavaScript Vite TypeScript template",
-  "private": true,
+  "name": "mountain-lion-habitat-analysis-js",
+  "description": "A sample application that analyzes mountain lion habitat in the Santa Monica Mountains using ArcGIS Maps SDK for JavaScript.",
   "type": "module",
   "scripts": {
     "dev": "vite",
