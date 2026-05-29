@@ -87,7 +87,7 @@ function syncFilterItemDescriptions(selectedLayerId) {
 
 const INSET_BASEMAP_ID = "2613486fd0d64002ab733a7cd3979b77";
 const HIGHLIGHT_EXTENT_OUTLINE_COLOR = [197, 109, 71, 1];
-const MAIN_MASK_FILL_COLOR = [208, 183, 159, 0.25];
+const MAIN_MASK_FILL_COLOR = [208, 183, 159, 0.3];
 const INSET_MASK_FILL_COLOR = [208, 183, 159, 0.6];
 const INSET_OVERVIEW_ZOOM = 3;
 const INSET_DEFAULT_ZOOM = INSET_OVERVIEW_ZOOM + 1;
@@ -313,6 +313,7 @@ const ROAD_BAND_ID = 0;
 const PROTECTED_STATUS_BAND_ID = 1;
 const LAND_COVER_BAND_ID = 2;
 const TERRAIN_RUGGEDNESS_BAND_ID = 3;
+const MAIN_REFERENCE_LAYER_ID = "ef45864f467e4a96a0413dc15587e359";
 const MAIN_MAX_ZOOM = 15;
 const MAIN_START_ZOOM = 8;
 const MOBILE_LAYOUT_QUERY = globalThis.matchMedia("(max-width: 760px)");
@@ -686,9 +687,17 @@ async function initializeApp() {
     visible: false,
   });
 
+  const mainReferenceLayer = await Layer.fromPortalItem({
+    portalItem: {
+      id: MAIN_REFERENCE_LAYER_ID,
+    },
+    listMode: "hide",
+    popupEnabled: false,
+  });
+
   const map = new Map({
     basemap: "topo-vector",
-    layers: [groupLayer],
+    layers: [mainReferenceLayer, groupLayer],
   });
 
   mapElement.map = map;
