@@ -16,6 +16,8 @@ import "@esri/calcite-components/components/calcite-slider";
 
 import Graphic from "@arcgis/core/Graphic";
 import Map from "@arcgis/core/Map";
+import Basemap from "@arcgis/core/Basemap";
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer";
 import GroupLayer from "@arcgis/core/layers/GroupLayer";
 import Layer from "@arcgis/core/layers/Layer";
 import Polygon from "@arcgis/core/geometry/Polygon";
@@ -164,7 +166,10 @@ function getInsetZoom(mainZoom) {
 }
 
 async function addExtentOverlay({ layers, map }) {
-  await Promise.all(layers.map((layer) => layer.load()));
+  await Promise.all(layers.map((layer) => layer.load())).catch(error => {
+    console.error("Error loading layers for extent overlay:", error);
+    return null;
+  });
 
   const sharedExtent = getSharedExtent(layers);
   if (!sharedExtent) {
@@ -200,7 +205,6 @@ async function setupInsetMap() {
   }
 
   insetMapElement.dataset.loaded = "false";
-  insetMapElement.uiComponents = [];
 
   const insetPortalLayer = await Layer.fromPortalItem({
     portalItem: {
@@ -232,6 +236,7 @@ async function setupInsetMap() {
     basemap: "topo-vector",
     layers: [insetPortalLayer, insetExtentLayer],
   });
+
   if (!insetMapElement.ready) {
     insetMapElement.addEventListener(
       "arcgisViewReadyChange",
@@ -260,7 +265,9 @@ async function setupInsetMap() {
       }
 
       insetZoom = nextInsetZoom;
-      await insetMapElement.goTo({ zoom: nextInsetZoom }, { animate: true });
+      await insetMapElement.goTo({ zoom: nextInsetZoom }, { animate: true }).catch((error) => {
+        console.error("Error syncing inset zoom:", error);
+      });
     };
 
     const syncInsetExtent = (extent = mapElement?.extent) => {
@@ -287,7 +294,9 @@ async function setupInsetMap() {
         zoom: insetZoom,
       },
       { animate: false },
-    );
+    ).catch((error) => {      console.error("Error setting initial inset view:", error);
+    });
+  
 
     const insetPanBounds = insetMapElement.extent?.clone();
     if (insetPanBounds) {
@@ -492,7 +501,7 @@ async function ensureInsetMapSetup() {
       })
       .catch((error) => {
         insetSetupPromise = null;
-        throw error;
+        console.error("Error setting up inset map:", error);
       });
   }
 
@@ -688,15 +697,16 @@ async function initializeApp() {
     visible: false,
   });
 
-  const vtseBasemap = await Layer.fromPortalItem({
+  const vtseBasemap = new VectorTileLayer({
     portalItem: {
       id: VTSE_BASEMAP_LAYER_ID,
     },
     listMode: "hide",
     popupEnabled: false,
+    effect: "opacity(0.75)"
   });
 
-  const vtseLabels = await Layer.fromPortalItem({
+  const vtseLabels = new VectorTileLayer({
     portalItem: {
       id: VTSE_LABELS_LAYER_ID,
     },
@@ -705,8 +715,11 @@ async function initializeApp() {
   });
 
   const map = new Map({
-    basemap: "topo-vector",
-    layers: [vtseBasemap, groupLayer, vtseLabels],
+    basemap: new Basemap({
+      baseLayers: [vtseBasemap],
+      referenceLayers: [vtseLabels],
+    }),
+    layers: [groupLayer],
   });
 
   mapElement.map = map;
@@ -753,11 +766,6 @@ async function initializeApp() {
         };
       }
     }
-
-    await map.basemap.loadAll();
-    map.basemap.baseLayers.forEach((layer) => {
-      layer.effect = "grayscale(1) opacity(0.5)";
-    });
   }
 
   function updateHabitatLayer() {

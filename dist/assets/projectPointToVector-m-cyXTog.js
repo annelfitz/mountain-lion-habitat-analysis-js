@@ -1,0 +1,1 @@
+import{xi as c,rH as i,cO as f,qv as u,wi as l}from"./index-zQI5mIlS.js";function o(n,a,r,e){if(c(n.spatialReference,r))return s[0]=n.x,s[1]=n.y,s[2]=n.z??0,i(s,n.spatialReference,0,a,r,0);const t=f(n,r,e);return!!t&&(a[0]=t.x,a[1]=t.y,a[2]=t.z??0,!0)}async function x(n,a,r,e){return await l(n.spatialReference,r,null,e),o(n,a,r)}const s=u();export{x as c,o as n};
