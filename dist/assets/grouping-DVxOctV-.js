@@ -1,0 +1,1 @@
+import{oz as n}from"./index-B8s1Letc.js";function f(o,r){let t;if(typeof o=="string")t=n(o+`-seed(${r})`);else{let e=12;t=o^r;do t=107*(t>>8^t)+e|0;while(--e!==0)}return(1+t/(1<<31))/2}function u(o){return Math.floor(f(o,i)*l)}const i=53290320,l=10;export{f as e,u as o};

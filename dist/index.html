@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mountain Lion Habitat Analysis</title>
     <link rel="icon" href="data:;base64,=" />
-    <script type="module" crossorigin src="./assets/index-D5tTa6H3.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BK0nWTaU.css">
+    <script type="module" crossorigin src="./assets/index-B8s1Letc.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-B8qcnh4X.css">
   </head>
 
   <body class="calcite-mode-light">
@@ -57,9 +57,11 @@
             slot="content-top"
           >
             <div class="map-title-super">ArcGIS Maps SDK for JavaScript</div>
-            <div class="map-title-main">Mountain Lions</div>
-            <div class="map-title-sub">of</div>
-            <div class="map-title-main">Los Angeles</div>
+            <div class="map-title-line">
+              <div class="map-title-main">Mountain Lions</div>
+              <div class="map-title-sub">of</div>
+            </div>
+            <div class="map-title-main map-title-city">Los Angeles</div>
             <div class="map-title-detail">
               Exploring mountain lion habitat factors and impacts in the greater
               Los Angeles region
@@ -207,16 +209,23 @@
           class="vintage-map-title title-detail-collapsible"
         >
           <div class="map-title-super">ArcGIS Maps SDK for JavaScript</div>
-          <div class="map-title-main">Mountain Lions</div>
-          <div class="map-title-sub">of</div>
-          <div class="map-title-main">Los Angeles</div>
+          <div class="map-title-line">
+            <div class="map-title-main">Mountain Lions</div>
+            <div class="map-title-sub">of</div>
+          </div>
+          <div class="map-title-main map-title-city">Los Angeles</div>
           <div class="map-title-detail">
             Exploring mountain lion habitat factors and impacts in the greater
             Los Angeles region
           </div>
         </div>
 
-        <arcgis-map id="mapElement" class="app-map" center="-118.6,34.33" zoom="10">
+        <arcgis-map
+          id="mapElement"
+          class="app-map"
+          center="-118.6,34.33"
+          zoom="10"
+        >
           <arcgis-home id="homeElement" slot="top-left"></arcgis-home>
           <arcgis-zoom slot="top-left"></arcgis-zoom>
         </arcgis-map>

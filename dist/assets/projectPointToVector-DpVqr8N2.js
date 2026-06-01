@@ -1,0 +1,1 @@
+import{wV as c,rt as f,cO as i,qj as u,vY as l}from"./index-B8s1Letc.js";function o(n,t,a,e){if(c(n.spatialReference,a))return s[0]=n.x,s[1]=n.y,s[2]=n.z??0,f(s,n.spatialReference,0,t,a,0);const r=i(n,a,e);return!!r&&(t[0]=r.x,t[1]=r.y,t[2]=r.z??0,!0)}async function x(n,t,a,e){return await l(n.spatialReference,a,null,e),o(n,t,a)}const s=u();export{x as c,o as n};
