@@ -313,7 +313,8 @@ const ROAD_BAND_ID = 0;
 const PROTECTED_STATUS_BAND_ID = 1;
 const LAND_COVER_BAND_ID = 2;
 const TERRAIN_RUGGEDNESS_BAND_ID = 3;
-const MAIN_REFERENCE_LAYER_ID = "ef45864f467e4a96a0413dc15587e359";
+const VTSE_BASEMAP_LAYER_ID = "ef45864f467e4a96a0413dc15587e359";
+const VTSE_LABELS_LAYER_ID = "08135613e548423aa27660bad7e649bb";
 const MAIN_MAX_ZOOM = 15;
 const MAIN_START_ZOOM = 8;
 const MOBILE_LAYOUT_QUERY = globalThis.matchMedia("(max-width: 760px)");
@@ -687,9 +688,17 @@ async function initializeApp() {
     visible: false,
   });
 
-  const mainReferenceLayer = await Layer.fromPortalItem({
+  const vtseBasemap = await Layer.fromPortalItem({
     portalItem: {
-      id: MAIN_REFERENCE_LAYER_ID,
+      id: VTSE_BASEMAP_LAYER_ID,
+    },
+    listMode: "hide",
+    popupEnabled: false,
+  });
+
+  const vtseLabels = await Layer.fromPortalItem({
+    portalItem: {
+      id: VTSE_LABELS_LAYER_ID,
     },
     listMode: "hide",
     popupEnabled: false,
@@ -697,7 +706,7 @@ async function initializeApp() {
 
   const map = new Map({
     basemap: "topo-vector",
-    layers: [mainReferenceLayer, groupLayer],
+    layers: [vtseBasemap, groupLayer, vtseLabels],
   });
 
   mapElement.map = map;
