@@ -1,0 +1,1 @@
+import{eu as a,pR as u}from"./index-zQI5mIlS.js";function i(e,n){return e===n||e!=null&&n!=null&&a(e.spatialReference,n.spatialReference)&&e.x===n.x&&e.y===n.y&&e.z===n.z&&e.m===n.m}function m(e,n,l){return e===n||e!=null&&n!=null&&a(e.spatialReference,n.spatialReference)&&u(e.x,n.x,l)&&u(e.y,n.y,l)&&u(e.z??0,n.z??0,l)&&u(e.m??0,n.m??0,l)}export{i as a,m as u};
