@@ -65,7 +65,7 @@ body {
   #filterShellPanel[slot="panel-bottom"] {
     display: block;
     margin: 0;
-    --calcite-shell-panel-min-height: 14rem;
+    --calcite-shell-panel-min-height: 10rem;
   }
 
   #filterShellPanel[slot="panel-bottom"] .vintage-map-title {
