@@ -606,9 +606,9 @@ function syncViewScale(isMobileLayout) {
   if (!mapElement) {
     return;
   }
-  mapElement.constraints = isMobileLayout
-    ? { ...mapElement.constraints, minZoom: MAIN_START_ZOOM - 1 }
-    : { ...mapElement.constraints, minZoom: MAIN_START_ZOOM };
+  mapElement.constraints.minZoom = isMobileLayout
+    ? MAIN_START_ZOOM - 1
+    : MAIN_START_ZOOM;
 }
 
 function syncMobileFilterSelectionUi(selectedLayerId) {
@@ -773,9 +773,16 @@ async function initializeApp() {
       if (homeElement) {
         homeElement.viewpoint = mapElement.viewpoint.clone();
       }
-
+      const isMobileLayout = MOBILE_LAYOUT_QUERY.matches;
       const mainPanBounds = highlightedAreaExtent.clone();
-      syncViewScale(MOBILE_LAYOUT_QUERY.matches);
+      if (mainPanBounds) {
+        mapElement.constraints = {
+          ...mapElement.constraints,
+          geometry: mainPanBounds,
+          minZoom: isMobileLayout ? MAIN_START_ZOOM-1 : MAIN_START_ZOOM,
+          maxZoom: MAIN_MAX_ZOOM,
+        };
+      }
     }
   }
 
