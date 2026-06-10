@@ -17,7 +17,7 @@ body {
   --calcite-color-text-1: hsl(20, 44%, 29%);
   --calcite-color-text-2: #3d3638;
   --calcite-color-text-3: #463d40;
-  --calcite-color-border-2: #e3c3bd;
+  --calcite-color-border-2: #c8b29f;
   font-family: "Noto Serif", Georgia, serif;
 }
 
@@ -123,7 +123,7 @@ body {
   width: 20rem;
   max-width: 60%;
   --calcite-progress-background-color: var(--calcite-color-surface-highlight);
-  transition: opacity 0.75s ease-out 0.5s;
+  transition: opacity 0.75s ease-out 0.125s;
 }
 
 #mapElement {
@@ -190,6 +190,9 @@ calcite-list-item:not([selected]) > [slot="content-bottom"] {
   display: none;
 }
 
+calcite-slider {
+  --calcite-slider-track-color: var(--calcite-color-border-2);
+}
 .slider-inline-row {
   display: flex;
   gap: var(--calcite-size-xxs);

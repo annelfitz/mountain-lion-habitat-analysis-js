@@ -13,7 +13,7 @@ import "@esri/calcite-components/components/calcite-list-item";
 import "@esri/calcite-components/components/calcite-icon";
 import "@esri/calcite-components/components/calcite-chip";
 import "@esri/calcite-components/components/calcite-slider";
-import "@esri/calcite-components/components/calcite-loader";
+import "@esri/calcite-components/components/calcite-progress";
 
 import Graphic from "@arcgis/core/Graphic";
 import Map from "@arcgis/core/Map";
@@ -67,7 +67,7 @@ async function ensureCustomElementsReady() {
   await Promise.all([
     globalThis.customElements.whenDefined("arcgis-map"),
     globalThis.customElements.whenDefined("calcite-slider"),
-    globalThis.customElements.whenDefined("calcite-loader"),
+    globalThis.customElements.whenDefined("calcite-progress"),
   ]);
 }
 
