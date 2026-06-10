@@ -94,10 +94,10 @@ function getSliderRange(slider) {
   ];
 }
 
-function syncRangeStats(slider, minElement, maxElement, unit) {
+function syncRangeStats(slider, minElement, maxElement) {
   const [minValue, maxValue] = getSliderRange(slider);
-  minElement.textContent = `${wholeNumberFormatter.format(Math.round(minValue))} ${unit}`;
-  maxElement.textContent = `${wholeNumberFormatter.format(Math.round(maxValue))} ${unit}`;
+  minElement.textContent = `${wholeNumberFormatter.format(Math.round(minValue))}`;
+  maxElement.textContent = `${wholeNumberFormatter.format(Math.round(maxValue))}`;
 }
 
 function getSelectedLayerId() {
@@ -832,7 +832,6 @@ async function initializeApp() {
       distanceToRoadSlider,
       distanceToRoadMinStat,
       distanceToRoadMaxStat,
-      "px",
     );
     distanceToRoadLayer.rasterFunction = createColormapFunction(
       createRoadFunction(roadThresholds),
@@ -850,7 +849,6 @@ async function initializeApp() {
       terrainRuggednessSlider,
       terrainRuggednessMinStat,
       terrainRuggednessMaxStat,
-      "px",
     );
     terrainRuggednessLayer.rasterFunction = createColormapFunction(
       createTerrainRuggednessFunction(ruggednessThresholds),
@@ -876,13 +874,11 @@ async function initializeApp() {
     distanceToRoadSlider,
     distanceToRoadMinStat,
     distanceToRoadMaxStat,
-    "px",
   );
   syncRangeStats(
     terrainRuggednessSlider,
     terrainRuggednessMinStat,
     terrainRuggednessMaxStat,
-    "px",
   );
 
   [distanceToRoadSlider, terrainRuggednessSlider].forEach(
