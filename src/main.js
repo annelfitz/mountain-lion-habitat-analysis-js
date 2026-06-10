@@ -13,6 +13,7 @@ import "@esri/calcite-components/components/calcite-list-item";
 import "@esri/calcite-components/components/calcite-icon";
 import "@esri/calcite-components/components/calcite-chip";
 import "@esri/calcite-components/components/calcite-slider";
+import "@esri/calcite-components/components/calcite-progress";
 
 import Graphic from "@arcgis/core/Graphic";
 import Map from "@arcgis/core/Map";
@@ -63,10 +64,16 @@ const wholeNumberFormatter = new Intl.NumberFormat("en-US");
 mapElement.dataset.loaded = "false";
 
 async function ensureCustomElementsReady() {
-  await Promise.all([
-    globalThis.customElements.whenDefined("arcgis-map"),
-    globalThis.customElements.whenDefined("calcite-slider"),
-  ]);
+  await globalThis.customElements.whenDefined("arcgis-map");
+}
+
+async function fadeMapBackgroundAfterLoad(mapComponent) {
+  if (!mapComponent) {
+    return;
+  }
+
+  await reactiveUtils.whenOnce(() => !mapComponent.updating);
+  mapComponent.dataset.loaded = "true";
 }
 
 function getSliderNumericValue(slider, propertyName, attributeName) {
@@ -264,16 +271,20 @@ async function setupInsetMap() {
     layers: [insetPortalLayer, insetExtentLayer],
   });
 
-  if (!insetMapElement.ready) {
-    insetMapElement.addEventListener(
-      "arcgisViewReadyChange",
-      handleInsetMapReady,
-      {
-        once: true,
-      },
-    );
+  if (insetMapElement.ready) {
+    await handleInsetMapReady();
   } else {
-    handleInsetMapReady();
+    await new Promise((resolve, reject) => {
+      insetMapElement.addEventListener(
+        "arcgisViewReadyChange",
+        () => {
+          handleInsetMapReady().then(resolve, reject);
+        },
+        {
+          once: true,
+        },
+      );
+    });
   }
 
   async function handleInsetMapReady() {
@@ -338,7 +349,7 @@ async function setupInsetMap() {
     }
 
     syncInsetExtent(initialExtent);
-    insetMapElement.dataset.loaded = "true";
+    await fadeMapBackgroundAfterLoad(insetMapElement);
     reactiveUtils.watch(() => mapElement.extent, syncInsetExtent);
     reactiveUtils.watch(
       () => mapElement.zoom,
@@ -615,6 +626,7 @@ function syncMobileFilterSelectionUi(selectedLayerId) {
   const isMobileLayout = MOBILE_LAYOUT_QUERY.matches;
   filterPanel.scale = isMobileLayout ? "m" : "l";
   filterList.scale = isMobileLayout ? "m" : "l";
+  filterList.interActionMode = isMobileLayout ? "static" : "interactive";
 
   mobileFilterActions.forEach((action) => {
     const isSelected = action.dataset.filterId === selectedLayerId;
@@ -625,17 +637,7 @@ function syncMobileFilterSelectionUi(selectedLayerId) {
 
   filterItems.forEach((item) => {
     const isVisible = !isMobileLayout || item.value === selectedLayerId;
-
     item.hidden = !isVisible;
-
-    if (isMobileLayout) {
-      item.setAttribute("interaction-mode", "static");
-      item.tabIndex = -1;
-      return;
-    }
-
-    item.removeAttribute("interaction-mode");
-    item.tabIndex = isVisible ? 0 : -1;
   });
 }
 
@@ -741,12 +743,18 @@ async function initializeApp() {
   });
 
   mapElement.map = map;
-  if (!mapElement.ready) {
-    mapElement.addEventListener("arcgisViewReadyChange", handleMapReady, {
-      once: true,
-    });
+  if (mapElement.ready) {
+    void handleMapReady();
   } else {
-    handleMapReady();
+    mapElement.addEventListener(
+      "arcgisViewReadyChange",
+      () => {
+        void handleMapReady();
+      },
+      {
+        once: true,
+      },
+    );
   }
 
   async function handleMapReady() {
@@ -784,6 +792,8 @@ async function initializeApp() {
         };
       }
     }
+
+    await fadeMapBackgroundAfterLoad(mapElement);
   }
 
   function updateHabitatLayer() {
@@ -900,7 +910,6 @@ async function initializeApp() {
   filterList.addEventListener("calciteListChange", updateHabitatLayer);
 
   updateHabitatLayer();
-  mapElement.dataset.loaded = "true";
 }
 
 void initializeApp().catch((error) => {

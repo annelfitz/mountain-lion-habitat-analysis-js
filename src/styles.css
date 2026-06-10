@@ -1,6 +1,3 @@
-/* -----------------------------
-   Base / Theming
-   ----------------------------- */
 html,
 body {
   padding: 0;
@@ -20,7 +17,7 @@ body {
   --calcite-color-text-1: hsl(20, 44%, 29%);
   --calcite-color-text-2: #3d3638;
   --calcite-color-text-3: #463d40;
-  --calcite-color-border-2: #e3c3bd;
+  --calcite-color-border-2: #c8b29f;
   font-family: "Noto Serif", Georgia, serif;
 }
 
@@ -32,9 +29,6 @@ body {
   }
 }
 
-/* -----------------------------
-   Layout
-   ----------------------------- */
 #appLayout {
   display: flex;
   flex-direction: column;
@@ -44,8 +38,6 @@ body {
 
 @media (max-width: 760px) {
   #appLayout {
-    flex: 1 1 auto;
-    min-height: 0;
     padding-inline-end: 0;
   }
 }
@@ -56,34 +48,16 @@ body {
   margin-inline-start: 0;
 }
 
-@media (max-width: 760px) {
-  #filterShellPanel {
-    margin-inline: calc(var(--app-frame-space) / 2) 0;
-    z-index: 9;
-  }
-
-  #filterShellPanel[slot="panel-bottom"] {
-    display: block;
-    margin: 0;
-    --calcite-shell-panel-min-height: 10rem;
-  }
-
-  #filterShellPanel[slot="panel-bottom"] .vintage-map-title {
-    display: none;
-  }
-
-  #filterShellPanel[slot="panel-bottom"] #filterPanel {
-    margin: 0;
-    --calcite-panel-content-top-space: 0 var(--calcite-size-xs)
-      var(--calcite-size-xs);
-    --calcite-panel-background-color: var(--calcite-color-foreground-3);
-    --calcite-color-foreground-1: var(--calcite-color-foreground-3);
-  }
-}
-
 @media (max-width: 1080px) {
   #filterShellPanel {
     --calcite-shell-panel-width: 22rem;
+  }
+}
+
+@media (max-width: 760px) {
+  #filterShellPanel {
+    margin: 0;
+    z-index: var(--calcite-z-index-overlay);
   }
 }
 
@@ -92,45 +66,91 @@ body {
   --calcite-panel-border-color: transparent;
 }
 
-@media (min-width: 761px) {
-  #filterShellPanel[slot="panel-end"] #mobileFilterActionBar {
-    display: none !important;
+@media (max-width: 760px) {
+  #filterPanel {
+    --calcite-color-foreground-1: var(--calcite-color-foreground-3);
   }
 }
 
-/* -----------------------------
-   Maps
-   ----------------------------- */
 .app-map {
-  display: block;
-  opacity: 0;
-  visibility: hidden;
+  position: relative;
   z-index: 2;
-  transition: opacity 0.3s ease;
+  background:
+    linear-gradient(
+      90deg,
+      var(--calcite-color-surface-highlight) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      var(--calcite-color-surface-highlight) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      135deg,
+      var(--calcite-color-foreground-3),
+      var(--calcite-color-foreground-2)
+    );
+  background-size:
+    1.75rem 1.75rem,
+    1.75rem 1.75rem,
+    auto;
 }
 
-.app-map[data-loaded="true"] {
+.app-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
   opacity: 1;
-  visibility: visible;
+  background: inherit;
+  background-size: inherit;
+  transition: opacity 0.75s ease-out 0.5s;
+}
+
+#mapFrame {
+  display: grid;
+  flex: 1 1 auto;
+}
+
+#mapFrame > * {
+  grid-area: 1 / 1;
+}
+
+.map-loading-progress {
+  place-self: center;
+  z-index: var(--calcite-z-index-overlay);
+  opacity: 1;
+  width: 20rem;
+  max-width: 60%;
+  --calcite-progress-background-color: var(--calcite-color-surface-highlight);
+  transition: opacity 0.75s ease-out 0.125s;
 }
 
 #mapElement {
-  flex: 1 1 auto;
   box-shadow: var(--calcite-shadow-md);
-  overflow: visible;
 }
 
 @media (max-width: 760px) {
-  #mapElement {
+  #mapFrame {
     margin: var(--app-frame-space) 0 0;
     width: 100%;
   }
 }
 
+.app-map[data-loaded="true"]::after,
+#mapFrame:has(#mapElement[data-loaded="true"]) .map-loading-progress {
+  opacity: 0;
+}
+
 #insetMapElement {
+  block-size: 14rem;
   box-shadow: var(--calcite-shadow-sm);
   pointer-events: none;
-  block-size: 14rem;
+  background-size:
+    1rem 1rem,
+    1rem 1rem,
+    auto;
 }
 
 @media (max-height: 720px), (max-width: 760px) {
@@ -139,43 +159,43 @@ body {
   }
 }
 
-/* -----------------------------
-   Filters
-   ----------------------------- */
-#filterList calcite-list-item {
+calcite-list {
+  width: 100%;
+}
+
+calcite-list-item {
   --calcite-list-border-color: transparent;
-  transition: margin-inline-start
-    var(--filter-item-margin-transition-duration, 0.15s) ease-in-out;
+  transition: margin-inline-start 0.15s ease-in-out;
   margin-inline-start: 0.75rem;
 }
 
-#filterList calcite-list-item > calcite-icon[slot="content-start"] {
+calcite-list-item > calcite-icon[slot="content-start"] {
   color: var(--calcite-color-text-1);
-  transition: color 0.25s ease-in-out;
+  transition: color 0.15s ease-in-out;
 }
 
-#filterList calcite-list-item > [slot="content-bottom"] {
-  display: none;
-  container-type: inline-size;
-}
-
-#filterList calcite-list-item[selected] {
+calcite-list-item[selected] {
   --calcite-list-background-color: var(--calcite-color-foreground-current);
   margin-inline-start: 0;
 }
 
-#filterList calcite-list-item[selected] > calcite-icon[slot="content-start"] {
+calcite-list-item[selected] > calcite-icon[slot="content-start"] {
   color: var(--calcite-color-brand);
 }
 
-#filterList calcite-list-item[selected] > [slot="content-bottom"] {
-  display: block;
+calcite-list-item[selected] > [slot="content-bottom"] {
   margin-block-start: var(--calcite-size-xxs);
 }
 
+calcite-list-item:not([selected]) > [slot="content-bottom"] {
+  display: none;
+}
+
+calcite-slider {
+  --calcite-slider-track-color: var(--calcite-color-border-2);
+}
 .slider-inline-row {
   display: flex;
-  align-items: center;
   gap: var(--calcite-size-xxs);
   width: 100%;
 }
@@ -197,18 +217,13 @@ body {
 }
 
 .slider-stat-label {
-  font-size: 0.68rem;
-  line-height: 1;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.7;
-  margin-inline-end: 0.35rem;
+  margin-inline-end: 0.5rem;
 }
 
 .slider-stat-value {
   display: inline-block;
-  font-size: 0.82rem;
-  line-height: 1;
+  font-size: 0.875rem;
   font-weight: 700;
   min-inline-size: 3.3rem;
   text-align: right;
@@ -216,42 +231,10 @@ body {
 }
 
 @media (max-width: 760px) {
-  #filterShellPanel[slot="panel-bottom"] #filterList {
-    display: block;
-    margin-block-start: 0;
-    padding: 0;
-  }
-
   #filterShellPanel[slot="panel-bottom"]:has(#filterPanel:not([closed])):has(
-      #mobileFilterActionBar calcite-action[selected]
+      calcite-action[selected]
     ) {
     background-color: var(--calcite-color-foreground-3);
-  }
-
-  #filterShellPanel[slot="panel-bottom"] #filterList calcite-list-item {
-    margin-inline-start: 0;
-  }
-
-  #filterShellPanel[slot="panel-bottom"]
-    #filterList
-    calcite-list-item[selected] {
-    --calcite-list-background-color: transparent;
-  }
-
-  #filterShellPanel[slot="panel-bottom"]
-    #filterList
-    calcite-list-item[selected]
-    > calcite-icon[slot="content-start"] {
-    color: var(--calcite-color-text-1);
-  }
-
-  #filterShellPanel[slot="panel-bottom"]
-    #filterList
-    calcite-list-item
-    > [slot="content-bottom"] {
-    display: block;
-    pointer-events: auto;
-    margin-block-start: 0.25rem;
   }
 
   #mobileFilterActionBar {
@@ -262,26 +245,36 @@ body {
     --calcite-action-bar-background-color: var(--calcite-color-foreground-2);
   }
 
+  #mobileFilterActionBar calcite-action {
+    --calcite-icon-color: var(--calcite-color-text-1);
+  }
+
   #mobileFilterActionBar calcite-action[selected] {
     --calcite-color-transparent-press: var(--calcite-color-brand);
     --calcite-icon-color: var(--calcite-color-foreground-2);
   }
+}
 
-  #mobileFilterActionBar calcite-action[selected] :is(.text, calcite-icon) {
-    color: inherit;
+@media (min-width: 761px) {
+  #mobileFilterActionBar {
+    display: none;
   }
 }
 
-/* -----------------------------
-   Titles
-   ----------------------------- */
 #mobileTitleBlock {
   display: none;
 }
 
 .vintage-map-title {
   --map-title-detail-display: block;
+  font-size: 1rem;
   margin-block-end: calc(var(--app-frame-space) / 2);
+}
+
+@media (max-width: 760px) {
+  .vintage-map-title {
+    display: none;
+  }
 }
 
 .map-title-line {
@@ -291,15 +284,15 @@ body {
 }
 
 .map-title-main {
-  font-size: 1.625rem;
-  letter-spacing: 2px;
+  font-size: 1.625em;
+  letter-spacing: 0.067em;
   color: var(--calcite-color-text-1);
   text-transform: uppercase;
 }
 
 .map-title-city {
-  font-size: 2.25rem;
-  letter-spacing: 4px;
+  font-size: 2.25em;
+  letter-spacing: 0.056em;
   margin-block-start: 0.25rem;
   font-weight: var(--calcite-font-weight-bold);
 }
@@ -315,20 +308,19 @@ body {
   align-self: center;
   white-space: nowrap;
   flex: 0 0 auto;
-  font-size: var(--calcite-font-size--1);
+  font-size: 0.875rem;
 }
 
 .map-title-detail {
   display: var(--map-title-detail-display);
-  font-size: var(--calcite-font-size--1);
-  letter-spacing: 1px;
+  font-size: 0.875rem;
   border-top: 6px solid var(--calcite-color-brand);
   margin-block-start: var(--calcite-size-xxs);
   padding-block-start: var(--calcite-size-xxs);
 }
 
 .map-title-super {
-  font-size: var(--calcite-font-size--2);
+  font-size: 0.875rem;
   color: var(--calcite-color-brand);
   font-weight: var(--calcite-font-weight-bold);
   margin-block-end: var(--calcite-size-xxxs);

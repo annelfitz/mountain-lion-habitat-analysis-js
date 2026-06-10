@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Mountain Lion Habitat Analysis</title>
   </head>
 
@@ -71,7 +74,6 @@
             label="Mountain lion habitat filters"
             selection-mode="single"
             selection-appearance="highlight"
-            tabindex="0"
           >
             <calcite-list-item
               value="habitatAnalysis"
@@ -217,15 +219,22 @@
           </div>
         </div>
 
-        <arcgis-map
-          id="mapElement"
-          class="app-map"
-          center="-118.6,34.33"
-          zoom="10"
-        >
-          <arcgis-home id="homeElement" slot="top-left"></arcgis-home>
-          <arcgis-zoom slot="top-left"></arcgis-zoom>
-        </arcgis-map>
+        <div id="mapFrame">
+          <calcite-progress
+            class="map-loading-progress"
+            type="indeterminate"
+            label="Loading map"
+          ></calcite-progress>
+          <arcgis-map
+            id="mapElement"
+            class="app-map"
+            center="-118.6,34.33"
+            zoom="10"
+          >
+            <arcgis-home id="homeElement" slot="top-left"></arcgis-home>
+            <arcgis-zoom slot="top-left"></arcgis-zoom>
+          </arcgis-map>
+        </div>
       </main>
     </calcite-shell>
     <script type="module" src="/src/main.js"></script>
