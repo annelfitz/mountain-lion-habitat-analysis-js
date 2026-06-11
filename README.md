@@ -1,4 +1,4 @@
-# mountain-lion-habitat-analysis-js
+# Mountain Lion Habitat Analysis
 
 Showcase application for the [ArcGIS Maps SDK for JavaScript](https://js.arcgis.com/) that analyzes mountain lion habitat factors in the Santa Monica Mountains and greater Los Angeles region.
 
